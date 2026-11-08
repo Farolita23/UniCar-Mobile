@@ -1,0 +1,783 @@
+/* ========================================
+   SECCIÓN HERO PRINCIPAL
+   ======================================== */
+
+/* Contenedor hero con fondo decorativo y bordes; el margen lateral lo pone el .container,
+   así el titular queda alineado con las secciones de debajo */
+:host .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 88px 0 72px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 64px;
+}
+
+/* Capa de fondo del hero para elementos decorativos */
+:host .hero .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Grano cinematográfico: textura fina superpuesta que da tacto de material a la escena */
+:host .hero .hero-bg .hero-grain {
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    animation: grain-shift 1s steps(4) infinite;
+    pointer-events: none;
+}
+
+/* Parpadeo discreto del grano, como textura de película en movimiento */
+@keyframes grain-shift {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2%, 1%); }
+    50% { transform: translate(1%, -2%); }
+    75% { transform: translate(-1%, 2%); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Viñeta que enmarca la escena y concentra la atención hacia el contenido */
+:host .hero .hero-bg .hero-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 80% at 32% 38%, transparent 45%, rgba(0, 0, 0, 0.35) 100%);
+    pointer-events: none;
+}
+
+/* Contenido del hero en una sola columna. Es contenedor de consultas para que el titular
+   se mida con su ancho real (cqi) y no con el de la ventana */
+:host .hero .hero-content {
+    position: relative;
+    z-index: 1;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: start;
+}
+
+/* Titular protagonista en tres líneas. El tamaño sale del ancho de "hacia la uni" (8,5em):
+   así la frase pintada ocupa casi todo el ancho y nunca se parte, del móvil al escritorio */
+:host .hero .hero-content .hero-title {
+    font-size: clamp(32px, 11.4cqi, 112px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    margin-bottom: 8px;
+}
+
+/* Frase pintada, con la línea de la carretera debajo. Sin soporte de background-clip: text
+   se queda en rojo, como el titular de siempre */
+:host .hero .hero-paint {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+    padding-bottom: 0.2em;
+    color: var(--primary);
+}
+
+/* Un único texto: empieza solo con el contorno, como la carretera antes de pintarla, y un fondo
+   rojo recortado a las letras la recorre de izquierda a derecha con el borde difuminado.
+   El fondo mide 2,24 veces la frase (el doble más el difuminado, un 24%): en 100% queda justo fuera
+   y en 0 la cubre entera, y su borde avanza al ritmo de la línea. Al final se apaga el contorno */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+    :host .hero .hero-paint {
+        color: transparent;
+        -webkit-text-stroke: max(1px, 0.012em) rgba(242, 242, 242, 0.3);
+        background: linear-gradient(90deg, var(--primary) 44.5%, transparent 55.5%) 100% 0 / 224% 100% no-repeat;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: hero-paint 1.9s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+    }
+}
+
+@keyframes hero-paint {
+    85% {
+        -webkit-text-stroke-color: rgba(242, 242, 242, 0.3);
+    }
+
+    to {
+        background-position: 0 0;
+        -webkit-text-stroke-color: transparent;
+    }
+}
+
+/* Línea discontinua de la carretera: se traza un poco por delante del rojo, como si lo fuera pintando */
+:host .hero .hero-road {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.04em;
+    height: max(3px, 0.035em);
+    background: repeating-linear-gradient(90deg, var(--accent) 0 0.16em, transparent 0.16em 0.3em);
+    clip-path: inset(0 100% 0 0);
+    animation: hero-road 1.9s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
+}
+
+@keyframes hero-road {
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* Respeto por preferencias de movimiento reducido: el grano deja de parpadear
+   y el titular aparece ya pintado, con la línea completa */
+@media (prefers-reduced-motion: reduce) {
+    :host .hero .hero-bg .hero-grain {
+        animation: none;
+    }
+
+    :host .hero .hero-paint {
+        animation: none;
+        background-position: 0 0;
+        -webkit-text-stroke-color: transparent;
+    }
+
+    :host .hero .hero-road {
+        animation: none;
+        clip-path: none;
+    }
+}
+
+/* Subtítulo descriptivo del hero */
+:host .hero .hero-content .hero-sub {
+    color: var(--text-2);
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 32px;
+    max-width: 40ch;
+    text-wrap: pretty;
+}
+
+/* Grid de botones de acción en el hero */
+:host .hero .hero-content .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Botones de acción dentro del hero; texto centrado también cuando se estiran a todo el ancho */
+:host .hero .hero-content .hero-actions .hero-btn {
+    justify-content: center;
+    padding: 16px 32px;
+    font-size: 16px;
+}
+
+/* ========================================
+   BLOB BUTTON (CTA primario del hero)
+   Efecto gooey rojo al hover + respuesta táctil al pulsar
+   ======================================== */
+
+/* Contenedor del botón: pastilla clara con texto e icono rojos */
+:host .blob-btn {
+    --blob-color: #fff;
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 32px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 0 0 rgba(230, 57, 70, 0);
+    /* El "squish" al pulsar usa una curva con rebote para que se sienta elástico */
+    transition: color 0.5s, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s;
+}
+
+/* Etiqueta (icono + texto) por encima de los blobs */
+:host .blob-btn .blob-btn__label {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Borde rojo de la pastilla */
+:host .blob-btn::before {
+    content: "";
+    z-index: 1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--primary);
+    border-radius: 30px;
+    pointer-events: none;
+}
+
+/* Capa auxiliar que se desplaza al hover (profundidad) */
+:host .blob-btn::after {
+    content: "";
+    z-index: -2;
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    transition: all 0.3s 0.2s;
+}
+
+/* Fondo interior rojo donde "flotan" los blobs blancos */
+:host .blob-btn .blob-btn__inner {
+    z-index: -1;
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    background: var(--primary);
+}
+
+/* Contenedor de blobs con el filtro gooey */
+:host .blob-btn .blob-btn__blobs {
+    position: relative;
+    display: block;
+    height: 100%;
+    filter: url('#goo');
+}
+
+/* Cada gota roja, oculta abajo hasta el hover */
+:host .blob-btn .blob-btn__blob {
+    position: absolute;
+    top: 2px;
+    width: 25%;
+    height: 100%;
+    background: var(--blob-color);
+    border-radius: 100%;
+    transform: translate3d(0, 150%, 0) scale(1.7);
+    transition: transform 0.45s;
+}
+
+@supports (filter: url('#goo')) {
+    :host .blob-btn .blob-btn__blob {
+        transform: translate3d(0, 150%, 0) scale(1.4);
+    }
+}
+
+:host .blob-btn .blob-btn__blob:nth-child(1) { left: 0%;  transition-delay: 0s; }
+:host .blob-btn .blob-btn__blob:nth-child(2) { left: 30%; transition-delay: 0.08s; }
+:host .blob-btn .blob-btn__blob:nth-child(3) { left: 60%; transition-delay: 0.16s; }
+:host .blob-btn .blob-btn__blob:nth-child(4) { left: 90%; transition-delay: 0.24s; }
+
+/* Hover: las gotas blancas llenan el botón y el texto pasa a rojo */
+:host .blob-btn:hover {
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(230, 57, 70, 0.4);
+}
+
+:host .blob-btn:hover::after {
+    transition: all 0.3s;
+    left: 0;
+    top: 0;
+}
+
+:host .blob-btn:hover .blob-btn__blob {
+    transform: translateZ(0) scale(1.7);
+}
+
+@supports (filter: url('#goo')) {
+    :host .blob-btn:hover .blob-btn__blob {
+        transform: translateZ(0) scale(1.4);
+    }
+}
+
+/* Al pulsar: se "aplasta" y el glow se contrae (respuesta táctil) */
+:host .blob-btn:active {
+    transform: translateY(1px) scale(0.95);
+    box-shadow: 0 2px 10px rgba(230, 57, 70, 0.3);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+/* Foco accesible por teclado */
+:host .blob-btn:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
+
+/* Respeta la preferencia de menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+    :host .blob-btn,
+    :host .blob-btn:hover,
+    :host .blob-btn:active {
+        transform: none;
+        transition: color 0.3s, box-shadow 0.3s;
+    }
+    :host .blob-btn .blob-btn__blob {
+        transition: none;
+    }
+}
+
+/* ========================================
+   ENCABEZADOS DE SECCIÓN
+   ======================================== */
+
+/* Contenedor centrado para encabezados de secciones */
+:host .section-head {
+    text-align: center;
+    margin: 32px 0;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Badge principal de sección */
+:host .section-head .section-badge {
+    height: 16px;
+    font-size: 16px;
+    line-height: 16px;
+    display: block;
+    background: rgba(230, 57, 70, 0.15);
+    border: 1px solid rgba(230, 57, 70, 0.08);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--primary-light);
+}
+
+/* Badge alternativo con color acentuado */
+:host .section-head .section-badge-accent {
+    background: rgba(255, 183, 3, 0.1);
+    border-color: rgba(255, 183, 3, 0.2);
+    color: var(--accent);
+}
+
+/* Título principal de la sección */
+:host .section-head .section-title {
+    font-size: 32px;
+}
+
+/* Subtítulo descriptivo de la sección */
+:host .section-head .section-sub {
+    color: var(--text-2);
+    font-size: 16px;
+    max-width: 100%;
+    width: 512px;
+    margin-top: -16px;
+}
+
+/* ========================================
+   SECCIÓN ¿CÓMO FUNCIONA? (HOW)
+   ======================================== */
+
+/* Contenedor de la sección de pasos */
+:host .how-section {
+    padding-bottom: 64px;
+}
+
+/* ========================================
+   FRANJA DE CONFIANZA
+   ======================================== */
+
+/* Tres promesas en fila, sin tarjetas: se leen de un vistazo antes de bajar a los pasos */
+:host .trust-strip {
+    margin-top: -24px;
+    margin-bottom: 40px;
+}
+
+:host .trust-strip .trust-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+}
+
+:host .trust-strip .trust-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+:host .trust-strip .trust-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(230, 57, 70, 0.08);
+    border: 1px solid rgba(230, 57, 70, 0.18);
+}
+
+:host .trust-strip .trust-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+:host .trust-strip .trust-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+:host .trust-strip .trust-desc {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text-2);
+    text-wrap: pretty;
+}
+
+@media (max-width: 768px) {
+    :host .trust-strip .trust-list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Grid de 3 columnas para tarjetas de pasos */
+:host .how-section .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* Tarjeta individual de paso */
+:host .how-section .steps-grid .step-card {
+    width: calc(100% - 32px * 2 - 1px * 2);
+    padding: 32px;
+    overflow: hidden;
+    position: relative;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: var(--transition);
+}
+
+/* Efecto hover en tarjeta de paso: la misma subida corta que el resto de tarjetas */
+:host .how-section .steps-grid .step-card:hover {
+    border-color: rgba(230, 57, 70, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(230, 57, 70, 0.08);
+}
+
+/* Contenedor del icono y número del paso */
+:host .how-section .steps-grid .step-card .step-icon-wrap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+/* Icono del paso en cuadrado redondeado */
+:host .how-section .steps-grid .step-card .step-icon-wrap .step-icon {
+    font-size: 32px;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(230, 57, 70, 0.08);
+    border-radius: var(--radius-sm);
+}
+
+/* Número del paso: marca discreta del orden, sin brillo, que no compite con el título */
+:host .how-section .steps-grid .step-card .step-icon-wrap .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 800;
+    color: var(--text-2);
+    margin-left: 8px;
+}
+
+/* Título del paso */
+:host .how-section .steps-grid .step-card .step-title {
+    font-size: 24px;
+}
+
+/* Descripción del paso */
+:host .how-section .steps-grid .step-card .step-desc {
+    margin-top: -8px;
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    max-width: 32ch;
+    text-wrap: pretty;
+}
+
+/* ========================================
+   SECCIÓN VIAJES SUGERIDOS
+   ======================================== */
+
+/* Contenedor de la sección de viajes sugeridos */
+:host .suggested-section {
+    padding-bottom: 64px;
+}
+
+/* Grid flexible para tarjetas de viajes */
+:host .suggested-section .suggested-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-bottom: 32px;
+    gap: 16px;
+}
+
+/* Componentes de viaje en grid de 3 columnas */
+:host .suggested-section .suggested-grid app-trip {
+    width: calc((100% - 16px * 2) / 3);
+}
+
+/* Contenedor de estado de carga */
+:host .suggested-section .trips-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 48px 0;
+    color: var(--text-2);
+}
+
+/* Contenedor de estado vacío con iconografía */
+:host .suggested-section .trips-empty {
+    text-align: center;
+    padding: 64px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Ícono del estado vacío */
+:host .suggested-section .trips-empty-icon {
+    font-size: 48px;
+}
+
+/* Título del estado vacío */
+:host .suggested-section .trips-empty h3 {
+    font-size: 24px;
+}
+
+/* Texto descriptivo del estado vacío */
+:host .suggested-section .trips-empty p {
+    color: var(--text-2);
+    max-width: 256px;
+}
+
+/* Enlace "Ver todos" los viajes */
+:host .suggested-section .trips-see-all {
+    text-align: center;
+}
+
+/* ========================================
+   SECCIÓN CALL-TO-ACTION (CTA)
+   ======================================== */
+
+/* Contenedor de la sección CTA */
+:host .cta-section {
+    padding-bottom: 64px;
+}
+
+/* Contenedor interno del CTA con gradiente y bordes */
+:host .cta-section .cta-inner {
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.08), rgba(255, 183, 3, 0.06));
+    border: 1px solid rgba(230, 57, 70, 0.12);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* Contenedor de texto del CTA */
+:host .cta-section .cta-inner .cta-text {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Título del CTA */
+:host .cta-section .cta-inner .cta-text h2 {
+    font-size: 24px;
+}
+
+/* Descripción del CTA */
+:host .cta-section .cta-inner .cta-text p {
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.5;
+    width: 512px;
+    max-width: 100%;
+}
+
+/* Botón de acción del CTA */
+:host .cta-section .cta-inner .cta-action {
+    flex-shrink: 0;
+    padding: 16px 32px;
+    font-size: 16px;
+    height: 32px;
+    margin: 16px;
+}
+
+/* ========================================
+   MEDIA QUERIES - RESPONSIVIDAD
+   ======================================== */
+
+/* Tablets grandes (1024px o menos) - Cambios en layout */
+@media (max-width: calc(768px + 256px)) {
+    /* Grid de pasos en flex */
+    :host .how-section .steps-grid {
+        display: flex;
+    }
+
+    /* Tarjetas de pasos en 2 columnas */
+    :host .how-section .steps-grid .step-card {
+        width: calc((100% - 16px * 1 - 1px * 4 - 32px * 4) / 2);
+    }
+
+    /* Viajes en 2 columnas */
+    :host .suggested-section .suggested-grid app-trip {
+        width: calc((100% - 16px * 1) / 2);
+    }
+
+    /* CTA apilado verticalmente */
+    :host .cta-section .cta-inner {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* Texto del CTA con ancho completo */
+    :host .cta-section .cta-inner .cta-text {
+        width: calc(100% - 16px * 2);
+    }
+
+    /* Título del CTA centrado */
+    :host .cta-section .cta-inner .cta-text h2 {
+        text-align: center;
+    }
+
+    /* Descripción del CTA con ancho completo */
+    :host .cta-section .cta-inner .cta-text p {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Tablets (768px o menos) - Una columna */
+@media (max-width: 768px) {
+    /* Hero más compacto en móvil: menos aire arriba y abajo para llegar antes a los viajes */
+    :host .hero {
+        padding: 48px 0 40px;
+        margin-bottom: 40px;
+    }
+
+    /* Subtítulo hero con ancho completo */
+    :host .hero .hero-content .hero-sub {
+        max-width: 100%;
+        margin-bottom: 16px;
+    }
+
+    :host .trust-strip {
+        margin-top: 0;
+        margin-bottom: 24px;
+    }
+
+    :host .how-section {
+        padding-bottom: 40px;
+    }
+
+    :host .how-section .steps-grid {
+        gap: 8px;
+    }
+
+    :host .trips-see-all .btn {
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    /* Grid de pasos en una sola columna */
+    :host .how-section .steps-grid {
+        flex-direction: column;
+    }
+
+    /* Tarjetas de pasos a ancho completo y en fila: icono a la izquierda, texto al lado.
+       Así los tres pasos ocupan mucho menos y el primer viaje queda más arriba */
+    :host .how-section .steps-grid .step-card {
+        width: calc(100% - 20px * 2 - 1px * 2);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 16px;
+        row-gap: 4px;
+        align-items: center;
+    }
+
+    :host .how-section .steps-grid .step-card .step-icon-wrap {
+        grid-row: span 2;
+    }
+
+    :host .how-section .steps-grid .step-card .step-title {
+        font-size: 20px;
+    }
+
+    :host .how-section .steps-grid .step-card .step-desc {
+        margin-top: 0;
+        text-align: left;
+        max-width: none;
+    }
+
+    /* Viajes en una sola columna */
+    :host .suggested-section .suggested-grid {
+        flex-direction: column;
+    }
+
+    /* Viajes a ancho completo */
+    :host .suggested-section .suggested-grid app-trip {
+        width: 100%;
+    }
+
+    /* CTA apilado verticalmente */
+    :host .cta-section .cta-inner {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+/* Dispositivos móviles pequeños (384px o menos) */
+@media (max-width: 384px) {
+    /* Botones del hero en una sola columna */
+    :host .hero .hero-content .hero-actions {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+
+    /* Botones con ancho casi completo */
+    :host .hero .hero-content .hero-actions .hero-btn {
+        width: calc(100% - 32px * 2);
+    }
+}
+/* El contenido principal recibe el foco al usar "Saltar al contenido"; sin anillo, es solo un destino */
+:host main:focus {
+    outline: none;
+}

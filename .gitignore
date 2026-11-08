@@ -1,0 +1,19 @@
+# Dependencias de Node
+/node_modules
+
+# Cache y compilación de Angular
+/.angular
+
+# Configuración del editor
+*.code-workspace
+
+
+# Salida de compilacion
+/dist
+
+# Android (los builds se generan)
+/android/app/build
+/android/build
+/android/.gradle
+/android/local.properties
+/android/capacitor-cordova-android-plugins

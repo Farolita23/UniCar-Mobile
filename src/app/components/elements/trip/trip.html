@@ -1,0 +1,110 @@
+<article class="trip-card">
+    <div class="trip-card__direction" [class.to-campus]="data.isToCampus">
+        <span class="dir-icon">
+            <app-icon [icon]="data.isToCampus ? 'birrete' : 'casa'" [size]="22"></app-icon>
+        </span>
+        <span class="dir-label">{{ direction }}</span>
+        @if (data.periodicTripId) {
+        <span class="periodic-badge" title="Viaje de una serie periódica">
+            <app-icon icon="repetir" [size]="12"></app-icon> Periódico
+        </span>
+        }
+        <span class="free-seats" [class.low]="freeSeats <= 1" [class.full-seats]="freeSeats <= 0">
+            <app-icon icon="asiento" [size]="14"></app-icon>
+            @if (freeSeats <= 0) { Completo } @else { {{ seatsLabel }} } </span>
+    </div>
+
+    <div class="trip-card__body">
+        <div class="trip-card__route">
+            <div class="route-point">
+                <div class="dot" [class.dot-from]="data.isToCampus" [class.dot-to]="!data.isToCampus"></div>
+                <span>{{ data.isToCampus ? data.townDTO.name : data.campusDTO.name }}</span>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-point">
+                <div class="dot" [class.dot-from]="!data.isToCampus" [class.dot-to]="data.isToCampus"></div>
+                <span>{{ data.isToCampus ? data.campusDTO.name : data.townDTO.name }}</span>
+            </div>
+        </div>
+
+        <div class="trip-card__address">
+            <app-icon icon="pin" [size]="16"></app-icon>
+            {{ data.departureAddress }}
+        </div>
+
+        <div class="trip-card__meta">
+            <div class="meta-item">
+                <app-icon icon="calendario" [size]="16"></app-icon>
+                {{ formatDate(data.departureDate) }}
+            </div>
+            <div class="meta-item">
+                <app-icon icon="reloj" [size]="16"></app-icon>
+                {{ timeLabel }}
+            </div>
+            <div class="meta-item">
+                <app-icon icon="coche" [size]="16"></app-icon>
+                {{ data.carDTO.model }} · {{ data.carDTO.color }}
+            </div>
+        </div>
+
+        <!-- Quién conduce: lo primero que hay que saber antes de pedir plaza -->
+        @if (data.driverDTO) {
+            @if (isOwnTrip) {
+                <div class="trip-driver trip-driver--own">
+                    <app-icon icon="coche" [size]="16"></app-icon> Tu viaje
+                </div>
+            } @else {
+                <a class="trip-driver" [routerLink]="['/user', driverId]" [attr.aria-label]="driverAriaLabel">
+                    @if (data.driverDTO.profileImageUrl) {
+                        <img class="trip-driver__avatar" referrerpolicy="no-referrer" [src]="data.driverDTO.profileImageUrl | avatarUrl" alt="">
+                    } @else {
+                        <span class="trip-driver__avatar trip-driver__avatar--initials" aria-hidden="true">{{ driverInitials }}</span>
+                    }
+                    <span class="trip-driver__text">
+                        <span class="trip-driver__name">{{ driverShortName }}</span>
+                        @if (ratingsCount > 0) {
+                            <span class="trip-driver__rating"><span class="trip-driver__star" aria-hidden="true">★</span> {{ ratingLabel }} · {{ ratingsCountLabel }}</span>
+                        } @else {
+                            <span class="trip-driver__rating">Nuevo en UniCar</span>
+                        }
+                    </span>
+                </a>
+            }
+        }
+    </div>
+
+    <div class="trip-card__footer">
+        <div class="price">
+            <span class="price-amount">{{ priceLabel }}</span>
+            <span class="price-label">por persona</span>
+        </div>
+
+        <div class="trip-card__actions">
+            @if (auth.isLoggedIn()) {
+            @if(isOwnTrip){
+            <button class="btn btn-ghost trip-btn" (click)="goToManage()">
+                <app-icon icon="ajustes" [size]="15"></app-icon> Gestionar
+            </button>
+            } @else if (isPassenger) {
+            <button class="btn btn-ghost trip-btn" (click)="leaveTrip()" [disabled]="loading">
+                {{ loading ? '...' : 'Abandonar' }}
+            </button>
+            } @else if (hasRequested) {
+            <button class="btn btn-ghost trip-btn pending" (click)="cancelRequest()" [disabled]="loading">
+                {{ loading ? '...' : 'Cancelar solicitud' }}
+            </button>
+            } @else if (freeSeats > 0) {
+            <button class="btn btn-primary trip-btn" (click)="goToDetail()">
+                Ver viaje →
+            </button>
+            } @else {
+            <span class="badge badge-danger">Completo</span>
+            }
+            } @else if (freeSeats > 0) {
+            <a [routerLink]="['/trip-detail', data.id]" class="btn btn-primary trip-btn">Ver viaje</a>
+            } @else {
+            <span class="badge badge-danger">Completo</span>
+            }
+        </div>
+    </div>
+</article>

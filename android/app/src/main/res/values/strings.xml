@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">UniCar</string>
+    <string name="title_activity_main">UniCar</string>
+    <string name="package_name">com.unicar.app</string>
+    <string name="custom_url_scheme">com.unicar.app</string>
+</resources>
